@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div id="signUp" class="container">
+      <h1 class="title">Sign Up</h1>
+
+      <div class="formContents">
+        <div class="formQuestion">  
+          <label for="Fname">First Name: </label>
+          <input class="signupInput" type="text" id="Fname" name="FName" /> <br />
+        </div>
+
+        <div class="formQuestion">
+          <label for="Lname">Last Name: </label>
+          <input class="signupInput" type="text" id="Lname" name="Lname" /> <br />
+        </div>
+
+        <div class="formQuestion">
+          <label for="signUsername">Username: </label>
+          <input class="signupInput" type="text" id="signUsername" name="signUsername" /> <br />
+        </div>
+
+        <div class="formQuestion">
+          <label for="email">Email: </label>
+          <input class="signupInput" type="email" name="email" id="email" /> <br />
+        </div>
+
+        <div class="formQuestion">
+          <label for="signPassword">Password: </label>
+          <input class="signupInput" type="password" name="signPassword" id="signPassword" /> <br />
+        </div>
+
+        <div class="formQuestion">
+          <label for="passwordConfirm">Confirm Password: </label>
+          <input class="signupInput" type="password" name="passwordConfirm" id="passwordConfirm" /> <br />
+        </div>
+
+        <div class="formQuestion">
+          <button id="signUpSubmit" class="submit">Sign Up</button><br />
+        </div>
+
+        <p style="text-align: center;">Already have an account? Log in <a href="login.html">here</a>.</p>
+      </div>
+    </div>
+
+    <script src="client.js"></script>
+
+  </body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "name": "bpa-webapp-2021",
+  "version": "1.0.0",
+  "description": "Just a simple node server template to use as a foundation for other projects. Should also contain a description of what does what for the server for ease of modification.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "npx nodemon server.js",
+    "make": "openssl genrsa -out SSLCerts/key.pem && openssl req -new -key SSLCerts/key.pem -out SSLCerts/csr.pem && openssl x509 -req -days 9999 -in SSLCerts/csr.pem -signkey SSLCerts/key.pem -out SSLCerts/cert.pem && rm SSLCerts/csr.pem && npm i && npx nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cdubles102403/BPA-webapp-2021.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Cdubles102403/BPA-webapp-2021/issues"
+  },
+  "homepage": "https://github.com/Cdubles102403/BPA-webapp-2021#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "chalk": "^4.1.2",
+    "express": "^4.17.1",
+    "https": "^1.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "sqlite3": "^5.0.2"
+  }
+}

@@ -1,0 +1,66 @@
+/*Style.css file used by default in Index.html*/
+body {
+  background-color: #333333;
+}
+
+h1.title{
+  position: relative;
+  margin-left: auto; 
+  margin-right: auto;
+  text-align: center;
+}
+
+div.container {
+  position: static;
+  width: 350px;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #ffcc00;
+  border-radius: 10px;
+
+  content: "";
+  clear: both;
+  display: table;
+}
+
+div.formQuestion {
+  position: relative;
+  padding: 5px;
+}
+
+input.signupInput {
+  position: static;
+  float: right;
+}
+
+button.submit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  width: auto;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  width: 75px;
+  height: 40px;
+  border: none;
+  background-color: #eebb00;
+  border-radius: 12px;
+  box-shadow: 0 7px #333;
+  transition-duration: 0.1s;
+  /*background-color: #aa7700;*/
+  
+}
+
+button.submit:hover {
+  background-color: #cc9900;
+}
+
+button.submit:active {
+  box-shadow: 0 3px #333;
+  transform: translateY(4px);
+}
