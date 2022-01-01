@@ -27,5 +27,5 @@ npx nodemon server.js
 ```
 This will start the server in test mode, so every time you hit Save it will reload the server.
 once the server has started you can view the webpage at
-```localhost:443```.
+```https://localhost:443```.
 **When vavigating to the webpage you may encounter a page saying that the SSL certs are invalid, this is because they are self signed. you can get past this by pressing advanced >proceed anyway.**
