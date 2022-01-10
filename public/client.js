@@ -22,6 +22,8 @@ $(function () {
         .then((res) => {
           console.log(res)
           if(res.redirect == 'home'){
+            let token = res.token
+            localStorage.setItem('token', token);
             window.location.href = "/home.html"
           }
         });
@@ -49,6 +51,8 @@ $(function () {
         .then(res => res.json())
         .then((res)=>{
           if(res.redirect == 'home'){
+            let token = res.token
+            localStorage.setItem('token', token);
             window.location.href = "/home.html"
           }
         })

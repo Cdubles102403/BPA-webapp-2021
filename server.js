@@ -9,7 +9,7 @@ const fs = require("fs");
 const sql = require("sqlite3");
 const bcrypt = require("bcrypt");
 const sanitize = require("./resuables/sanitize.js");
-const JWT = require('./resuables/JWTFunctions.js')
+const JWT = require("./resuables/JWTFunctions.js");
 const credentials = {
   key: fs.readFileSync("SSLCerts/key.pem"),
   cert: fs.readFileSync("SSLCerts/cert.pem"),
@@ -43,66 +43,128 @@ app.post("/login", (req, res) => {
   console.log(chalk.red(username) + " : " + chalk.blue(password));
 
   let sqlFindAccount = "SELECT * FROM accounts WHERE username = ?";
-  db.all(sqlFindAccount,[username],(err,results)=>{
-    if(err) console.error(err)
+  db.all(sqlFindAccount, [username], (err, results) => {
+    if (err) console.error(err);
 
-    if(results.length>=1){
-      console.log(results)
+    if (results.length >= 1) {
+      console.log(results);
       //found user
       //check password
-      bcrypt.compare(password, results[0].password, function(err2, result) {
-        if(err2) console.error(err2)
-        console.log(result)
-        if(result){
+      bcrypt.compare(password, results[0].password, function (err2, result) {
+        if (err2) console.error(err2);
+        console.log(result);
+        if (result) {
+          let JWtoken = JWT.makeJWT(
+            results[0].password,
+            results[0].email,
+            results[0].username
+          );
+          console.log(JWtoken);
           //succesful login
-          console.log("good login")
-          res.send({message:"successful-login",redirect:"home"})
-        }
-        else{
+          console.log("good login");
+          res.send({
+            message: "successful-login",
+            redirect: "home",
+            token: JWtoken,
+          });
+        } else {
           //unsuccesful login
-          console.log("bad login")
-          res.send({message:'check-username-and-password'})
+          console.log("bad login");
+          res.send({ message: "check-username-and-password" });
         }
-    });
-    }
-    else{
+      });
+    } else {
       //user not found
-      console.log("bad login")
-      res.send({message:"check-username-and-password"})
+      console.log("bad login");
+      res.send({ message: "check-username-and-password" });
     }
-  })
+  });
 });
 
 //post request for signing up
 app.post("/signup", (req, res) => {
-  let insertUserSQL = 'INSERT INTO accounts(username,Fname,Lname,email,password) values(?,?,?,?,?)'
-  let checkUserSQL = 'SELECT * FROM accounts WHERE username =?'
+  let insertUserSQL =
+    "INSERT INTO accounts(username,Fname,Lname,email,password) values(?,?,?,?,?)";
+  let checkUserSQL = "SELECT * FROM accounts WHERE username =?";
   //get all user data
   let username = sanitize.sanitize(req.body.username);
   let Fname = sanitize.sanitize(req.body.Fname);
   let Lname = sanitize.sanitize(req.body.Lname);
   let password = sanitize.sanitize(req.body.password);
   let email = sanitize.sanitize(req.body.email);
-  
-  db.all(checkUserSQL,[username],(err,results)=>{
-    if(err) console.error(err)
-    console.log(results)
-    if(results[0] != undefined){
+
+  db.all(checkUserSQL, [username], (err, results) => {
+    if (err) console.error(err);
+    console.log(results);
+    if (results[0] != undefined) {
       //username already exists
-      res.send({message:"account-taken"})
-       }
-    else{
-      bcrypt.genSalt(saltRounds, function(err, salt) {
-        bcrypt.hash(password, salt, function(err, hash) {
-            //save data
-            db.run(insertUserSQL,[username,Fname,Lname,email,hash],(err)=>{
-              if(err) console.error(err)
-              res.send({message:"account-made",redirect:"home"})
-            })
+      res.send({ message: "account-taken" });
+    } else {
+      bcrypt.genSalt(saltRounds, function (err, salt) {
+        bcrypt.hash(password, salt, function (err, hash) {
+          //save data
+          db.run(
+            insertUserSQL,
+            [username, Fname, Lname, email, hash],
+            (err) => {
+              if (err) console.error(err);
+              let JWtoken = JWT.makeJWT(password, email, username);
+              res.send({
+                message: "account-made",
+                redirect: "home",
+                token: JWtoken,
+              });
+            }
+          );
         });
-    });
+      });
     }
-  })  
+  });
+});
+
+app.post("/makeEvent", (req, res) => {
+  //fill variables
+  let name = req.body.eventName;
+  let place = req.body.eventPlace;
+  let time = req.body.eventTime;
+  let participantTable = `${name}Participants`;
+  console.log(`${name}: ${time}: ${place}`);
+  //check if event name is taken
+  sql_checkEvent = "SELECT * FROM events WHERE name = ?";
+  db.all(sql_checkEvent, [name], (err, results) => {
+    if (err) {
+      console.error(err);
+    }
+    console.log(results.length);
+    if (results.length < 1) {
+      console.log("event already made");
+      //fill in event data
+      sql_makeEvent =
+        "INSERT INTO events(name,time,place,partipantsTable) values(?,?,?,?)";
+      db.run(sql_makeEvent, [name, time, place, participantTable], (err) => {
+        if (err) console.error(err);
+        console.log(`made ${name} event`);
+        //make event participant table
+        sql_makeEventParticipants = `CREATE TABLE "${name + "Participants"}" (
+          "id"	INTEGER,
+          "name"	TEXT UNIQUE,
+          PRIMARY KEY("id" AUTOINCREMENT)
+        );`;
+        console.log(sql_makeEventParticipants);
+        db.run(sql_makeEventParticipants, [], (err) => {
+          if (err) {
+            console.error(err);
+            res.send('event made')
+          }
+        });
+      });
+    } else {
+      console.log(`event ${name} already exists`);
+    }
+  });
+
+  //make event participants table
+  res.send("event made");
 });
 
 /**
