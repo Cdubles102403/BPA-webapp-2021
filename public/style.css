@@ -83,12 +83,3 @@ p {
   font-family: Georgia, 'Times New Roman', Times, serif;
   font-weight: bold;
 }
-
-.capsLock-alert{
-  display: none;
-}
-/*we will add the show class using javascript*/
-#password:focus + .capsLock-alert.show{
-  display: block;
-  color: rgb(255, 0, 0);
-}
