@@ -22,6 +22,12 @@ $(function () {
         .then((res) => {
           console.log(res)
           if(res.redirect == 'home'){
+            let token = res.token
+            localStorage.setItem('token', token);
+            localStorage.setItem('fname', res.fname);
+            localStorage.setItem('lname', res.lname);
+            localStorage.setItem('username', username);
+            localStorage.setItem('email', res.email);
             window.location.href = "/home.html"
           }
         });
@@ -49,6 +55,8 @@ $(function () {
         .then(res => res.json())
         .then((res)=>{
           if(res.redirect == 'home'){
+            let token = res.token
+            localStorage.setItem('token', token);
             window.location.href = "/home.html"
           }
         })

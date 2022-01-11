@@ -1,33 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="home.js"></script>
-    <link rel="stylesheet" href="main.css">
-    <title>Home page</title>
-</head>
-<body>
-<header>
-        <div class="logo">
-            <img src="https://i.postimg.cc/mg4rWBmv/logo.png" alt="">
-        </div>
-<ul class="nav-bar-tabs">
+  <head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+      <script src="home.js"></script>
+      <link rel="stylesheet" href="main.css">
+      <title>Home page</title>
+  </head>
+  <body>
+      <!--Navigation bar-->
+      <div id='header'></div>
 
+      <div id='makeEvent'>
+        <label for="eventName">Event Name:</label>
+        <input type="text" name="eventName" id="eventName"> <br>
+        <label for="eventTime">Event Time:</label>
+        <input type="time" name="eventTime" id="eventTime"> <br>
+        <label for="eventPlace">Place:</label>
+        <input type="text" name="eventPlace" id="eventPlace"> <br>
+        <button onClick='makeEvent()' id='submitEvent'>Create Event</button>
+      </div>
 
-<li><a href="home.html">Home</a></li>
-<li><a href="#">Option 1 </a></li>
-<li><a href="#">Option 2</a></li>
-<li><a href="#">Events</a></li>
-<li><a href="#">Account Details</a></li>
-</ul>
-</div>
-<div class="putsomethinghere">
-    <p> We should put something here<p>
-</div>
-
-</header>
-
+      <div>
+        <p>Stuff will go there soon</p>  
+      </div>
+  </body>
 </html>
