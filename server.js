@@ -157,25 +157,34 @@ app.post("/makeEvent", (req, res) => {
   console.log(`${name}: ${time}: ${place}`);
   //check if event name is taken
   sql_checkEvent = "SELECT * FROM events WHERE name = ?";
-  db.all(sql_checkEvent, [name], (err, results) => {
-    if (err) {console.error(err);}
-    console.log(results.length);
-    if (results.length < 1) {
-      //fill in event data
-      sql_makeEvent = "INSERT INTO events(name,time,place,partipantsTable) values(?,?,?,?)";
-      db.run(sql_makeEvent, [name, time, place, participantTable], (err) => {
-        if (err) console.error(err);
-        console.log(`made ${name} event`);
-        //make event participant table
-        let addResults = addParticipants(maker,name)
-      });
-    } else {
-      console.log(`event ${name} already exists`);
-    }
-  });
+  if(name !='' && place !='' && time == ''){
+    db.all(sql_checkEvent, [name], (err, results) => {
+      if (err) {console.error(err);}
+      console.log(results.length);
+      if (results.length < 1) {
+        //fill in event data
+        sql_makeEvent = "INSERT INTO events(name,time,place,partipantsTable) values(?,?,?,?)";
+        db.run(sql_makeEvent, [name, time, place, participantTable], (err) => {
+          if (err) console.error(err);
+          console.log(`made ${name} event`);
+          //make event participant table
+          let addResults = addParticipants(maker,name)
+        });
+        res.send("event made");
+      } else {
+        console.log(`event ${name} already exists`);
+        res.send('event already made')
+      }
+    });
+    
+  }
+  else{
+    res.send('missing info')
+  }
+  
 
   //make event participants table
-  res.send("event made");
+  
 });
 //get a list of all events
 app.get('/getAllEvents',(req,res)=>{
@@ -227,6 +236,28 @@ app.post('/joinEvent',(req,res)=>{
   else{
     res.send('already in event')
   }
+})
+//checks token for login
+app.post('/checkLogin',(req,res)=>{
+  let token = req.body.token
+  let decoded = JWT.verifyJWT(token)
+  let name = decoded.data.username
+  let password = decoded.data.password
+  
+  let sqlFindAccount = "SELECT * FROM accounts WHERE username = ?";
+  db.all(sqlFindAccount, [name], (err, results) => {
+    if (err) console.error(err);
+    console.log(results)
+    console.log(password)
+    if(results[0].password == password){
+      console.log('good check')
+      res.send({message:"good-check"})
+    }
+    else{
+      console.log('bad check')
+      res.send({message:'bad-check'})
+    }
+  });
 })
 
 /**

@@ -6,6 +6,24 @@ $(function(){
     if(token == null){
         window.location.href = "/login.html"
     }
+    
+    let payload ={
+        body: JSON.stringify({
+            'token':localStorage.getItem('token')
+        }),
+        method: "post",
+        headers: {
+          "content-type": "application/json",
+        },
+      };
+    fetch('/checkLogin',payload)
+        .then((res) => res.json())
+        .then((res)=>{
+            if(res.message == 'bad-check'){
+                window.location.href = '/index.html'
+            }
+        })
+
 })
 
 function makeEvent () {

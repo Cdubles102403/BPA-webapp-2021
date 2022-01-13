@@ -21,7 +21,7 @@ $(function(){
                     console.log(eventNames[i].event)
                     $('table#itineraryTable').append(`</tr>
                     <tr>
-                     <td>${eventNames[i].name}</td>
+                     <td>${eventData[i].name}</td>
                      <td>${eventData[i].place}</td>
                      <td>${eventData[i].time}</td>
                     </tr>
