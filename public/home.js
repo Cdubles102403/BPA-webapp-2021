@@ -14,7 +14,8 @@ function makeEvent () {
         body: JSON.stringify({
             "eventTime": $("#eventTime").val(),
             "eventName": $("#eventName").val(),
-            "eventPlace":$("#eventPlace").val()
+            "eventPlace":$("#eventPlace").val(),
+            'token':localStorage.getItem('token')
         }),
         method: "post",
         headers: {

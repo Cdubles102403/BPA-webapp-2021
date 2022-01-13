@@ -36,6 +36,26 @@ app.get("/", (req, res) => {
   res.send("index.html");
 });
 
+function addParticipants(name,event){
+  //check if already in event
+  let sql_checkParticipants = `SELECT * FROM ${event + "Participants"} WHERE name = ? `
+  let sql_addParticipant = `INSERT INTO ${event + "Participants"} (name) values(?)`
+  console.log(sql_addParticipant)
+  db.all(sql_checkParticipants,[name],(err,results)=>{
+    if(err){console.error(err)}
+    //if not in, join event
+    if(results<1){
+      db.run(sql_addParticipant,[name],(err)=>{
+        if(err){console.error(err)}
+        return 'added'
+      })
+    }
+    else{
+      return "AlreadyIn"
+    }
+  })
+}
+
 app.post("/login", (req, res) => {
   let username = sanitize.sanitize(req.body.Username);
   let password = sanitize.sanitize(req.body.Password);
@@ -124,23 +144,25 @@ app.post("/signup", (req, res) => {
 
 app.post("/makeEvent", (req, res) => {
   //fill variables
+  let token = req.body.token;
+  let decoded = JWT.verifyJWT(token)
+  console.log(decoded)
+  let maker = decoded.data.username;
+  console.log(maker)
   let name = req.body.eventName;
   let place = req.body.eventPlace;
   let time = req.body.eventTime;
   let participantTable = `${name}Participants`;
+
   console.log(`${name}: ${time}: ${place}`);
   //check if event name is taken
   sql_checkEvent = "SELECT * FROM events WHERE name = ?";
   db.all(sql_checkEvent, [name], (err, results) => {
-    if (err) {
-      console.error(err);
-    }
+    if (err) {console.error(err);}
     console.log(results.length);
     if (results.length < 1) {
-      console.log("event already made");
       //fill in event data
-      sql_makeEvent =
-        "INSERT INTO events(name,time,place,partipantsTable) values(?,?,?,?)";
+      sql_makeEvent = "INSERT INTO events(name,time,place,partipantsTable) values(?,?,?,?)";
       db.run(sql_makeEvent, [name, time, place, participantTable], (err) => {
         if (err) console.error(err);
         console.log(`made ${name} event`);
@@ -150,12 +172,10 @@ app.post("/makeEvent", (req, res) => {
           "name"	TEXT UNIQUE,
           PRIMARY KEY("id" AUTOINCREMENT)
         );`;
-        console.log(sql_makeEventParticipants);
         db.run(sql_makeEventParticipants, [], (err) => {
-          if (err) {
-            console.error(err);
-            res.send('event made')
-          }
+          if (err) {console.error(err);}
+          console.log('adding to table')
+            addParticipants(maker,name)
         });
       });
     } else {
@@ -166,12 +186,31 @@ app.post("/makeEvent", (req, res) => {
   //make event participants table
   res.send("event made");
 });
+//get a list of all events
+app.get('/getEvents',(req,res)=>{
+
+})
+
+//join an event
+app.post('/joinEvent',(req,res)=>{
+  //mak variables
+  let token = req.body.token;
+  let event = req.body.event;
+  let decodedToken = JWT.verifyJWT(token)
+
+  let results = addParticipants(decodedToken.name,event)
+
+  if(results=='added'){
+    res.send('added to event')
+  }
+  else{
+    res.send('already in event')
+  }
+})
 
 /**
  * Starts the server listening on PORT, and logs in the console that the server has started
  */
 var httpsServer = https.createServer(credentials, app);
 
-httpsServer.listen(PORT, () =>
-  console.log(chalk.yellow("Server started on port " + chalk.green(PORT)))
-);
+httpsServer.listen(PORT, () => console.log(chalk.yellow("Server started on port " + chalk.green(PORT))));
