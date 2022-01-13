@@ -23,7 +23,5 @@ function makeEvent () {
         },
       };
     fetch("/makeEvent", payload)
-        .then((res)=>{
-            console.log(res)
-        })
+        .then((res)=>{console.log(res)})
 }

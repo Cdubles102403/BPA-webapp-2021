@@ -37,23 +37,23 @@ app.get("/", (req, res) => {
 });
 
 function addParticipants(name,event){
-  //check if already in event
-  let sql_checkParticipants = `SELECT * FROM ${event + "Participants"} WHERE name = ? `
-  let sql_addParticipant = `INSERT INTO ${event + "Participants"} (name) values(?)`
-  console.log(sql_addParticipant)
-  db.all(sql_checkParticipants,[name],(err,results)=>{
-    if(err){console.error(err)}
-    //if not in, join event
-    if(results<1){
-      db.run(sql_addParticipant,[name],(err)=>{
-        if(err){console.error(err)}
-        return 'added'
-      })
-    }
-    else{
-      return "AlreadyIn"
-    }
-  })
+//check if user is in event
+let sql_findEventPartcipant = 'SELECT * FROM EventParticipantBridge WHERE name = ? AND event = ?'
+let sql_addParticipant = 'INSERT INTO EventParticipantBridge (name,event) values(?,?)'
+db.all(sql_findEventPartcipant,[name,event],(err,results)=>{
+  if(err){console.error(err)}
+  console.log(results)
+  if(results.length==0){
+    db.run(sql_addParticipant,[name,event],(err)=>{
+      if(err){console.error(err)}
+      return 'added'
+    })
+  }
+  else{
+    return 'notAdded'
+  }
+
+})
 }
 
 app.post("/login", (req, res) => {
@@ -167,16 +167,7 @@ app.post("/makeEvent", (req, res) => {
         if (err) console.error(err);
         console.log(`made ${name} event`);
         //make event participant table
-        sql_makeEventParticipants = `CREATE TABLE "${name + "Participants"}" (
-          "id"	INTEGER,
-          "name"	TEXT UNIQUE,
-          PRIMARY KEY("id" AUTOINCREMENT)
-        );`;
-        db.run(sql_makeEventParticipants, [], (err) => {
-          if (err) {console.error(err);}
-          console.log('adding to table')
-            addParticipants(maker,name)
-        });
+        let addResults = addParticipants(maker,name)
       });
     } else {
       console.log(`event ${name} already exists`);
@@ -187,10 +178,40 @@ app.post("/makeEvent", (req, res) => {
   res.send("event made");
 });
 //get a list of all events
-app.get('/getEvents',(req,res)=>{
+app.get('/getAllEvents',(req,res)=>{
 
 })
 
+//get person specific events
+app.post('/getMyEvents',(req,res)=>{
+  let token = req.body.token
+  let decoded = JWT.verifyJWT(token)
+  let name = decoded.data.username
+
+  let sql_getMyEvents = 'SELECT * FROM EventParticipantBridge WHERE name = ? '
+  //get all of a persons events
+  db.all(sql_getMyEvents,[name],(err,results)=>{
+    if(err){console.error(err)}
+
+    console.log(results)
+    //get event data
+    let data =''
+    //collect all events
+    for(let i = 0; i<results.length;i++){
+      data += `"${results[i].event}", `
+    }
+    data = data.substring(0, data.length - 2);
+    console.log(data)
+    let sql_getEventData = `SELECT name,place,time FROM events WHERE name IN (${data})`
+    db.all(sql_getEventData,[],(err2,results2)=>{
+      if(err2){console.error(err2)}
+      console.log(results2)
+
+      res.send({message:'myEvents',eventNames:results,eventData:results2})
+    })
+    
+  })
+})
 //join an event
 app.post('/joinEvent',(req,res)=>{
   //mak variables
@@ -198,7 +219,7 @@ app.post('/joinEvent',(req,res)=>{
   let event = req.body.event;
   let decodedToken = JWT.verifyJWT(token)
 
-  let results = addParticipants(decodedToken.name,event)
+  let results = addParticipants(decodedToken.data.username,event)
 
   if(results=='added'){
     res.send('added to event')
