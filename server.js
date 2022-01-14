@@ -157,7 +157,7 @@ app.post("/makeEvent", (req, res) => {
   console.log(`${name}: ${time}: ${place}`);
   //check if event name is taken
   sql_checkEvent = "SELECT * FROM events WHERE name = ?";
-  if(name !='' && place !='' && time == ''){
+  if(name !='' && place !='' && time != ''){
     db.all(sql_checkEvent, [name], (err, results) => {
       if (err) {console.error(err);}
       console.log(results.length);
@@ -179,16 +179,19 @@ app.post("/makeEvent", (req, res) => {
     
   }
   else{
+    console.log('missing info')
     res.send('missing info')
   }
-  
-
-  //make event participants table
-  
 });
 //get a list of all events
 app.get('/getAllEvents',(req,res)=>{
+  let sql_getAllEvents = 'SELECT * FROM events'
 
+  db.all(sql_getAllEvents,[],(err,results)=>{
+    if(err){console.error(err)}
+    console.log(results)
+    res.send({message:'all Events', data:results})
+  })
 })
 
 //get person specific events
@@ -243,12 +246,13 @@ app.post('/checkLogin',(req,res)=>{
   let decoded = JWT.verifyJWT(token)
   let name = decoded.data.username
   let password = decoded.data.password
-  
+  //find account
   let sqlFindAccount = "SELECT * FROM accounts WHERE username = ?";
   db.all(sqlFindAccount, [name], (err, results) => {
     if (err) console.error(err);
     console.log(results)
     console.log(password)
+    //check if passwords match
     if(results[0].password == password){
       console.log('good check')
       res.send({message:"good-check"})
@@ -259,6 +263,8 @@ app.post('/checkLogin',(req,res)=>{
     }
   });
 })
+
+
 
 /**
  * Starts the server listening on PORT, and logs in the console that the server has started
