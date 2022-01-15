@@ -274,6 +274,15 @@ app.post('/checkLogin',(req,res)=>{
   });
 })
 
+app.get('/getAllAccounts',(req,res)=>{
+  let sql_getAllAccounts = 'SELECT username,Lname,Fname,email FROM accounts'
+  
+  db.all(sql_getAllAccounts,[],(err,results)=>{
+    console.log(results)
+    if(err){console.error(err)}
+    res.send({data:results})
+  })
+})
 
 /**
  * Starts the server listening on PORT, and logs in the console that the server has started
