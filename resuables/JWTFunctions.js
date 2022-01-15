@@ -2,11 +2,12 @@ const JWT = require('jsonwebtoken')
 
 
 var token ={
-    makeJWT : function(password,email,username){
+    makeJWT : function(password,email,username,isAdmin){
         let payload ={
           password:password,
           email:email,
-          username:username
+          username:username,
+          isAdmin:isAdmin
         }
         const token = JWT.sign({
           data: payload

@@ -78,14 +78,20 @@ app.post("/login", (req, res) => {
           let JWtoken = JWT.makeJWT(
             results[0].password,
             results[0].email,
-            results[0].username
+            results[0].username,
+            results[0].isAdmin
           );
           console.log(JWtoken);
           //succesful login
           console.log("good login");
+          let isAdmin = 0
+          if(results[0].isAdmin == 1){
+            isAdmin = 1
+          }
           res.send({
             message: "successful-login",
             redirect: "home",
+            admin:isAdmin,
             token: JWtoken,
           });
         } else {
@@ -129,7 +135,7 @@ app.post("/signup", (req, res) => {
             [username, Fname, Lname, email, hash],
             (err) => {
               if (err) console.error(err);
-              let JWtoken = JWT.makeJWT(password, email, username);
+              let JWtoken = JWT.makeJWT(password, email, username,0);
               res.send({
                 message: "account-made",
                 redirect: "home",
