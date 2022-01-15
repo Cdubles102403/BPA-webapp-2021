@@ -36,6 +36,27 @@
    res.send("index.html");
  });
  
+ function addParticipants(name,event,seat){
+   console.log(`adding to seat ${seat}`)
+ //check if user is in event
+ let sql_findEventPartcipant = 'SELECT * FROM EventParticipantBridge WHERE name = ? AND event = ?'
+ let sql_addParticipant = 'INSERT INTO EventParticipantBridge (name,event,seat) values(?,?,?)'
+ db.all(sql_findEventPartcipant,[name,event],(err,results)=>{
+   if(err){console.error(err)}
+   console.log(results.length)
+   if(results.length==0){
+     db.run(sql_addParticipant,[name,event,seat],(err)=>{
+       if(err){console.error(err)}
+ 
+       return 'added'
+     })
+   }
+   else{
+     return 'notAdded'
+   }
+ })
+ }
+ 
  app.post("/login", (req, res) => {
    let username = sanitize.sanitize(req.body.Username);
    let password = sanitize.sanitize(req.body.Password);
@@ -57,18 +78,25 @@
            let JWtoken = JWT.makeJWT(
              results[0].password,
              results[0].email,
-             results[0].username
+             results[0].username,
+             results[0].isAdmin
            );
            console.log(JWtoken);
            //succesful login
            console.log("good login");
+           let isAdmin = 0
+           if(results[0].isAdmin == 1){
+             isAdmin = 1
+           }
            res.send({
              message: "successful-login",
              redirect: "home",
+             admin:isAdmin,
              token: JWtoken,
              fname: results[0].Fname,
              lname: results[0].Lname,
-             email: results[0].email
+             email: results[0].email,
+             username: results[0].username
            });
          } else {
            //unsuccesful login
@@ -111,7 +139,7 @@
              [username, Fname, Lname, email, hash],
              (err) => {
                if (err) console.error(err);
-               let JWtoken = JWT.makeJWT(password, email, username);
+               let JWtoken = JWT.makeJWT(password, email, username,0);
                res.send({
                  message: "account-made",
                  redirect: "home",
@@ -127,54 +155,142 @@
  
  app.post("/makeEvent", (req, res) => {
    //fill variables
+   let token = req.body.token;
+   let seats = req.body.seats;
+   let decoded = JWT.verifyJWT(token)
+   console.log(decoded)
+   let maker = decoded.data.username;
+   console.log(maker)
    let name = req.body.eventName;
    let place = req.body.eventPlace;
    let time = req.body.eventTime;
-   let participantTable = `${name}Participants`;
+ 
+   console.log
    console.log(`${name}: ${time}: ${place}`);
    //check if event name is taken
    sql_checkEvent = "SELECT * FROM events WHERE name = ?";
-   db.all(sql_checkEvent, [name], (err, results) => {
-     if (err) {
-       console.error(err);
-     }
-     console.log(results.length);
-     if (results.length < 1) {
-       console.log("event already made");
-       //fill in event data
-       sql_makeEvent =
-         "INSERT INTO events(name,time,place,partipantsTable) values(?,?,?,?)";
-       db.run(sql_makeEvent, [name, time, place, participantTable], (err) => {
-         if (err) console.error(err);
-         console.log(`made ${name} event`);
-         //make event participant table
-         sql_makeEventParticipants = `CREATE TABLE "${name + "Participants"}" (
-           "id"	INTEGER,
-           "name"	TEXT UNIQUE,
-           PRIMARY KEY("id" AUTOINCREMENT)
-         );`;
-         console.log(sql_makeEventParticipants);
-         db.run(sql_makeEventParticipants, [], (err) => {
-           if (err) {
-             console.error(err);
-             res.send('event made')
-           }
+   if(name !='' && place !='' && time != ''){
+     db.all(sql_checkEvent, [name], (err, results) => {
+       if (err) {console.error(err);}
+       if (results.length < 1) {
+         //fill in event data
+         sql_makeEvent = "INSERT INTO events(name,time,place,seats) values(?,?,?,?)";
+         db.run(sql_makeEvent, [name, time, place,seats], (err) => {
+           if (err) console.error(err);
+           console.log(`made ${name} event`);
+           let addResults = addParticipants(maker,name)
          });
-       });
-     } else {
-       console.log(`event ${name} already exists`);
+         res.send("event made");
+       } else {
+         console.log(`event ${name} already exists`);
+         res.send('event already made')
+       }
+     });
+     
+   }
+   else{
+     console.log('missing info')
+     res.send('missing info')
+   }
+ });
+ //get a list of all events
+ app.get('/getAllEvents',(req,res)=>{
+   let sql_getAllEvents = 'SELECT * FROM events'
+   let sql_getSeats = 'SELECT event,seat FROM eventParticipantBridge'
+   db.all(sql_getAllEvents,[],(err,results)=>{
+     db.all(sql_getSeats,[],(err2,results2)=>{
+       if(err2){console.error(err2)}
+       console.log(results2)
+     //console.log(results)
+     res.send({message:'all Events',data:results,seatData:results2})
+     })
+   })
+ })
+ 
+ //get person specific events
+ app.post('/getMyEvents',(req,res)=>{
+   let token = req.body.token
+   let decoded = JWT.verifyJWT(token)
+   let name = decoded.data.username
+ 
+   let sql_getMyEvents = 'SELECT * FROM EventParticipantBridge WHERE name = ? '
+   //get all of a persons events
+   db.all(sql_getMyEvents,[name],(err,results)=>{
+     if(err){console.error(err)}
+ 
+     console.log(results)
+     //get event data
+     let data =''
+     //collect all events
+     for(let i = 0; i<results.length;i++){
+       data += `"${results[i].event}", `
+     }
+     data = data.substring(0, data.length - 2);
+     console.log(data)
+     let sql_getEventData = `SELECT name,place,time FROM events WHERE name IN (${data})`
+     db.all(sql_getEventData,[],(err2,results2)=>{
+       if(err2){console.error(err2)}
+       console.log(results2)
+ 
+       res.send({message:'myEvents',eventData:results2})
+     })
+     
+   })
+ })
+ //join an event
+ app.post('/joinEvent',(req,res)=>{
+   //mak variables
+   let token = req.body.token;
+   let event = req.body.event;
+   let decodedToken = JWT.verifyJWT(token)
+   let seat = req.body.seat;
+ 
+    let results = addParticipants(decodedToken.data.username,event,seat)
+ 
+   if(results=='added'){
+     res.send({message:'added to event'})
+   }
+   else{
+     res.send({message:'already in event'})
+   }
+ })
+ //checks token for login
+ app.post('/checkLogin',(req,res)=>{
+   let token = req.body.token
+   let decoded = JWT.verifyJWT(token)
+   let name = decoded.data.username
+   let password = decoded.data.password
+   //find account
+   let sqlFindAccount = "SELECT * FROM accounts WHERE username = ?";
+   db.all(sqlFindAccount, [name], (err, results) => {
+     if (err) console.error(err);
+     console.log(results)
+     console.log(password)
+     //check if passwords match
+     if(results[0].password == password){
+       console.log('good check')
+       res.send({message:"good-check"})
+     }
+     else{
+       console.log('bad check')
+       res.send({message:'bad-check'})
      }
    });
+ })
  
-   //make event participants table
-   res.send("event made");
- });
+ app.get('/getAllAccounts',(req,res)=>{
+   let sql_getAllAccounts = 'SELECT username,Lname,Fname,email FROM accounts'
+   
+   db.all(sql_getAllAccounts,[],(err,results)=>{
+     console.log(results)
+     if(err){console.error(err)}
+     res.send({data:results})
+   })
+ })
  
  /**
   * Starts the server listening on PORT, and logs in the console that the server has started
   */
  var httpsServer = https.createServer(credentials, app);
  
- httpsServer.listen(PORT, () =>
-   console.log(chalk.yellow("Server started on port " + chalk.green(PORT)))
- );
+ httpsServer.listen(PORT, () => console.log(chalk.yellow("Server started on port " + chalk.green(PORT))));

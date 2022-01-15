@@ -1,79 +1,58 @@
 body {
-  font-family: Georgia, 'Times New Roman', Times, serif;
-	margin: 0;
-	padding: 0;
-}
-#headerButtons {
-	width: 1170px;
-	margin: auto;
-}
-nav {
-  background-color: #333;
-	height: 100vh;
-	position: relative;
-}
-.nav-bar-tabs {
-	float: right;
-	list-style: none;
-	margin-top: 30px;
-}
-.nav-bar-tabs li {
-	display: inline-block;
-}
-.nav-bar-tabs li a {
-	color: #fff;
-	text-decoration: none;
-	padding: 5px 20px;
-	font-family: poppins;
-	font-size: 16px;
-	text-transform: uppercase;
-	border-radius: 12px;
-	
-}
-.nav-bar-tabs li a:hover {
-	background: goldenrod
-}
-.logo {
-	float: left;
-  margin-top: -5px;
-}
-.logo img {
-	width: 100%;
-	padding: 15px 0;
-}
-.contents {
-	position: absolute;
-	text-align: center;
-}
-/*resposive*/
+    background-color: #333333;
+    color:#ffcc00;
+  }
 
-@media (max-width:600px) {
-	#headerButtons {
-		width: 100%;
-	}
-	.logo {
-		float: none;
-		width: 50%;
-		text-align: center;
-		margin: auto;
-	}
-	img {
-		width: auto;
-	}
-	.nav-bar-tabs {
-		float: none;
-		margin-top: 0;
-	}
-	.nav-bar-tabs li a {
-		padding: 5px;
-		font-size: 11px;
-	}
-	.nav-bar-tabs {
-		text-align: center;
-	}
-	.contents {
-		width: 100%;
-		height: auto;
-		margin: 30% 0;
-	}
-}
+  .headerButton {
+
+    font-size:25px;
+    border-radius:10px;
+    color:#4CAF50;
+    border: 2px solid black;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    text-transform: uppercase;
+  }
+
+  .headerButton:hover {
+    background-color: #4CAF50; /* Green */
+    color: white;
+  }
+  div#header{
+    text-align: center;
+  }
+
+  div#makeEvent{
+    text-align: center;
+    padding: 2%;
+  }
+
+  button#submitEvent{
+  border-radius: 10px;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-weight: bold;
+  font-size: 15px;
+  }
+
+  button#submitEvent:hover {
+    background-color: #cc9900;
+  }
+
+  div#account-details{
+    text-align: center;
+  }
+  
+  p{
+    color: rgb(120, 120, 238);
+    font-size: 18px;
+  }
+
+  h1{
+    font-size: 40px;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+  }
+
+  label{
+    font-size: 16px;
+  }
+

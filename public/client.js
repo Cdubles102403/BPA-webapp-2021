@@ -26,7 +26,7 @@ $(function () {
             localStorage.setItem('token', token);
             localStorage.setItem('fname', res.fname);
             localStorage.setItem('lname', res.lname);
-            localStorage.setItem('username', username);
+            localStorage.setItem('username', res.username);
             localStorage.setItem('email', res.email);
             window.location.href = "/home.html"
           }

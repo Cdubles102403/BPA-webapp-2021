@@ -1,30 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-      <script src="home.js"></script>
-      <link rel="stylesheet" href="main.css">
-      <title>Home page</title>
-  </head>
-  <body>
-      <!--Navigation bar-->
-      <div id='header'></div>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="jquery.min.js"></script>
+    <script src="home.js"></script>
+    <link rel="stylesheet" href="main.css">
+    <title>Home page</title>
+</head>
+<body>
+    
+    <div id='header'></div>
+    <div id='makeEvent'>
+        <label for="eventName">Event Name:</label> <br>
+        <input type="text" name="eventName" id="eventName"> <br> <br>
+        <label for="eventTime">Event Time:</label> <br>
+        <input type="datetime-local" name="eventTime" id="eventTime"> <br> <br>
+        <label for="eventPlace"> Event Place:</label> <br>
+        <input type="text" name="eventPlace" id="eventPlace"> <br> <br>
+        <label for="seats">Number of seats:</label> <br>
+        <input type="number" name="seats" id="seats"> <br> <br>
+        <button onClick='makeEvent()' id='submitEvent'>Create Event</button> <br>
+    </div>
 
-      <div id='makeEvent'>
-        <label for="eventName">Event Name:</label>
-        <input type="text" name="eventName" id="eventName"> <br>
-        <label for="eventTime">Event Time:</label>
-        <input type="time" name="eventTime" id="eventTime"> <br>
-        <label for="eventPlace">Place:</label>
-        <input type="text" name="eventPlace" id="eventPlace"> <br>
-        <button onClick='makeEvent()' id='submitEvent'>Create Event</button>
-      </div>
-
-      <div>
-        <p>Stuff will go there soon</p>  
-      </div>
-  </body>
+    </div>
+</body>
 </html>

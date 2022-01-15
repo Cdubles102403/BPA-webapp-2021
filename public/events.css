@@ -1,0 +1,20 @@
+#allEvents{
+    overflow:hidden;
+    padding: 2%;
+}
+.event{
+    border:2px solid black;
+    float:left;
+    width: 15%;
+    text-align: center;
+}
+
+button#joinEvent{
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 13px;
+    }
+  
+    button#joinEvent:hover {
+      background-color: #cc9900;
+    }
