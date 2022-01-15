@@ -21,8 +21,10 @@ $(function(){
                 console.log(res)
                 let token = res.token
                 localStorage.setItem('token', token);
-                if(res.admin = 1){
-                    window.location.href = '/admin.html'
+                console.log(res.admin)
+                if(res.admin == 1){
+                  console.log('is admin')
+                  window.location.href = '/admin.html'
                 }
               });
           }
