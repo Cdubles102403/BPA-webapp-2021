@@ -13,12 +13,10 @@ $(function(){
         fetch('/getMyEvents',payload)
             .then((res) => res.json())
             .then((res)=>{
-                let eventNames = res.eventNames
                 let eventData = res.eventData
                 console.log(eventData)
 
-                for(let i=0; i<eventNames.length;i++){
-                    console.log(eventNames[i].event)
+                for(let i=0; i<eventData.length;i++){
                     $('table#itineraryTable').append(`</tr>
                     <tr>
                      <td>${eventData[i].name}</td>

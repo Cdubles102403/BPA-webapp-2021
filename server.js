@@ -36,23 +36,24 @@ app.get("/", (req, res) => {
   res.send("index.html");
 });
 
-function addParticipants(name,event){
+function addParticipants(name,event,seat){
+  console.log(`adding to seat ${seat}`)
 //check if user is in event
 let sql_findEventPartcipant = 'SELECT * FROM EventParticipantBridge WHERE name = ? AND event = ?'
-let sql_addParticipant = 'INSERT INTO EventParticipantBridge (name,event) values(?,?)'
+let sql_addParticipant = 'INSERT INTO EventParticipantBridge (name,event,seat) values(?,?,?)'
 db.all(sql_findEventPartcipant,[name,event],(err,results)=>{
   if(err){console.error(err)}
-  console.log(results)
+  console.log(results.length)
   if(results.length==0){
-    db.run(sql_addParticipant,[name,event],(err)=>{
+    db.run(sql_addParticipant,[name,event,seat],(err)=>{
       if(err){console.error(err)}
+
       return 'added'
     })
   }
   else{
     return 'notAdded'
   }
-
 })
 }
 
@@ -145,6 +146,7 @@ app.post("/signup", (req, res) => {
 app.post("/makeEvent", (req, res) => {
   //fill variables
   let token = req.body.token;
+  let seats = req.body.seats;
   let decoded = JWT.verifyJWT(token)
   console.log(decoded)
   let maker = decoded.data.username;
@@ -152,22 +154,20 @@ app.post("/makeEvent", (req, res) => {
   let name = req.body.eventName;
   let place = req.body.eventPlace;
   let time = req.body.eventTime;
-  let participantTable = `${name}Participants`;
 
+  console.log
   console.log(`${name}: ${time}: ${place}`);
   //check if event name is taken
   sql_checkEvent = "SELECT * FROM events WHERE name = ?";
   if(name !='' && place !='' && time != ''){
     db.all(sql_checkEvent, [name], (err, results) => {
       if (err) {console.error(err);}
-      console.log(results.length);
       if (results.length < 1) {
         //fill in event data
-        sql_makeEvent = "INSERT INTO events(name,time,place,partipantsTable) values(?,?,?,?)";
-        db.run(sql_makeEvent, [name, time, place, participantTable], (err) => {
+        sql_makeEvent = "INSERT INTO events(name,time,place,seats) values(?,?,?,?)";
+        db.run(sql_makeEvent, [name, time, place,seats], (err) => {
           if (err) console.error(err);
           console.log(`made ${name} event`);
-          //make event participant table
           let addResults = addParticipants(maker,name)
         });
         res.send("event made");
@@ -186,11 +186,14 @@ app.post("/makeEvent", (req, res) => {
 //get a list of all events
 app.get('/getAllEvents',(req,res)=>{
   let sql_getAllEvents = 'SELECT * FROM events'
-
+  let sql_getSeats = 'SELECT event,seat FROM eventParticipantBridge'
   db.all(sql_getAllEvents,[],(err,results)=>{
-    if(err){console.error(err)}
-    console.log(results)
-    res.send({message:'all Events', data:results})
+    db.all(sql_getSeats,[],(err2,results2)=>{
+      if(err2){console.error(err2)}
+      console.log(results2)
+    //console.log(results)
+    res.send({message:'all Events',data:results,seatData:results2})
+    })
   })
 })
 
@@ -219,7 +222,7 @@ app.post('/getMyEvents',(req,res)=>{
       if(err2){console.error(err2)}
       console.log(results2)
 
-      res.send({message:'myEvents',eventNames:results,eventData:results2})
+      res.send({message:'myEvents',eventData:results2})
     })
     
   })
@@ -230,14 +233,15 @@ app.post('/joinEvent',(req,res)=>{
   let token = req.body.token;
   let event = req.body.event;
   let decodedToken = JWT.verifyJWT(token)
+  let seat = req.body.seat;
 
-  let results = addParticipants(decodedToken.data.username,event)
+   let results = addParticipants(decodedToken.data.username,event,seat)
 
   if(results=='added'){
-    res.send('added to event')
+    res.send({message:'added to event'})
   }
   else{
-    res.send('already in event')
+    res.send({message:'already in event'})
   }
 })
 //checks token for login
@@ -263,7 +267,6 @@ app.post('/checkLogin',(req,res)=>{
     }
   });
 })
-
 
 
 /**

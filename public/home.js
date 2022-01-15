@@ -33,6 +33,7 @@ function makeEvent () {
             "eventTime": $("#eventTime").val(),
             "eventName": $("#eventName").val(),
             "eventPlace":$("#eventPlace").val(),
+            "seats":$('#seats').val(),
             'token':localStorage.getItem('token')
         }),
         method: "post",
