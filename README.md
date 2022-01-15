@@ -2,7 +2,7 @@
 
 ## Desctiption
 
-Just a simple node server template to use as a foundation for other projects. Should also contain a description of what does what for the server for ease of modification.
+Web app for the 2021-2022 BPA web app challenge.
 
 ## Installation
 
@@ -28,4 +28,9 @@ npx nodemon server.js
 This will start the server in test mode, so every time you hit Save it will reload the server.
 once the server has started you can view the webpage at
 ```https://localhost:443```.
-**When vavigating to the webpage you may encounter a page saying that the SSL certs are invalid, this is because they are self signed. you can get past this by pressing advanced >proceed anyway.**
+**When navigating to the webpage you may encounter a page saying that the SSL certs are invalid, this is because they are self signed. you can get past this by pressing advanced >proceed anyway.**
+
+To login using the admin accounts navigate to 
+```https://localhost/adminLogin.html```.
+and sign in using ```username:admin and password: Admin100``` 
+**using the admin account to sign up for events and seats will cause problems**
